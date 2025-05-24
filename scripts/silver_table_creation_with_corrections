@@ -194,3 +194,136 @@ end as sls_price
 from bronze.crm_sales_details
 
 --------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+**this is for customer extra information**
+
+
+=======================================================
+
+
+
+Drop Table IF exists silver.erp_cust_az12;
+create table silver.erp_cust_az12(
+cid varchar(50),
+bdate date,
+gen varchar(50),
+dwh_create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+----------------------------------------------------------
+
+
+
+**inserting the table which was cleasned and corrected**
+
+-------------------------------------------------------------
+
+
+
+
+
+
+insert into silver.erp_cust_az12(
+cid,
+bdate,
+gend
+)
+select 
+
+CASE WHEN cid like 'NAS%' then substring(cid,4, length(cid))
+else cid
+end as cid,
+case when bdate > current_timestamp then null
+else bdate
+end as bdate,
+case when upper(trim(gen)) in ('F', 'female') then 'female'
+when upper(trim(gen)) in ('M', 'male') then 'male'
+else 'n/a'
+end as gen
+from bronze.erp_cust_az12
+
+
+
+-----------------------------------------------------------------------------
+
+
+
+
+** this is the table for country**
+
+==============================================
+
+
+
+Drop Table IF exists silver.erp_loc_a101;
+create table silver.erp_loc_a101(
+cid varchar(50),
+cntry varchar(50),
+dwh_create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+=========================================================
+
+
+
+
+**inserting the table which was cleasned and corrected**
+
+-------------------------------------------------------------
+
+
+
+insert into silver.erp_loc_a101
+select
+replace(cid, '-','')cid,
+case when trim(cntry)='DE' then 'Germany'
+when trim(cntry) in ('US', 'USA') then 'United States'
+when trim(cntry)='' or cntry is null then 'n/a'
+else trim(cntry)
+end as cntry
+from bronze.erp_loc_a101;
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+
+Drop Table IF exists silver.erp_px_cat_g1v2;
+create table silver.erp_px_cat_g1v2(
+id            varchar(50),
+cat           varchar(50),
+subcat        varchar(50),
+maintenance   varchar(50),
+dwh_create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+=========================================================
+
+
+
+
+**inserting the table which was cleasned and corrected**
+
+-------------------------------------------------------------
+
+Insert into silver.erp_px_cat_g1v2(
+id,cat,subcat,maintenance
+)
+select
+id,
+cat,
+subcat,
+maintenance
+from bronze.erp_px_cat_g1v2
+
+
+
+
+
