@@ -2,6 +2,72 @@
 ==================================================
 
 
+Drop Table IF exists silver.crm_cust_info;
+create table silver.crm_cust_info (
+cst_id INT,
+cst_key Varchar(50),
+cst_firstname varchar(50),
+cst_lastname varchar(50),
+cst_material_status varchar(50),
+cst_gndr varchar(50),
+cst_create_date Date,
+dwh_create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+=========================================================
+
+
+
+
+**inserting the table which was cleasned and corrected**
+
+-------------------------------------------------------------
+
+
+
+insert into silver.crm_cust_info(
+cst_id,
+cst_key,
+cst_firstname,
+cst_lastname,
+cst_material_status,
+cst_gndr,
+cst_create_date)
+select
+cst_id,
+cst_key,
+TRIM(cst_firstname) as cst_firstname,
+TRIM(cst_lastname) as cst_lastname,
+case when upper(trim(cst_material_status)) = 'S' then 'Single'
+when upper(trim(cst_material_status)) = 'M' then 'Married'
+ELSE 'n/a'
+end cst_material_status,
+case when upper(trim(cst_gndr)) = 'F' then 'Female'
+when upper(trim(cst_gndr)) = 'M' then  'Male'
+ELSE 'n/a'
+end cst_gndr,
+cst_create_date
+From(
+select
+*,
+row_number() over(partition by cst_id order by cst_create_date desc) as flag_last
+from bronze.crm_cust_info
+where cst_id is not null
+)t where flag_last = 1
+
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+**This is the table for product information**
+==================================================
+
+
 Drop Table IF exists silver.crm_prd_info;
 create table silver.crm_prd_info(
  prd_id         INT,
