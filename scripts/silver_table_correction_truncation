@@ -120,8 +120,8 @@ end as cid,
 case when bdate > current_timestamp then null
 else bdate
 end as bdate,
-case when upper(trim(gen)) in ('F', 'female') then 'female'
-when upper(trim(gen)) in ('M', 'male') then 'male'
+case when upper(trim(gen)) in ('F', 'FEMALE') then 'female'
+when upper(trim(gen)) in ('M', 'MALE') then 'male'
 else 'n/a'
 end as gen
 from bronze.erp_cust_az12;
